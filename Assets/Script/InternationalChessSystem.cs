@@ -14,15 +14,34 @@ public class InternationalChessSystem : MonoBehaviour
 	public Grid[] CheckerboardGrids;
 	public Transform[] StartingGrids; // 白棋：0~15、黑棋：16~31
 
-	public List<Chess> WhiteChess = new List<Chess> ();
-	public List<Chess> BlackChess = new List<Chess> ();
-
 	[Header ("Game Play Use")]
 	public Camp Player1_Camp;
 	public Camp Player2_Camp;
-	public Camp Turn_Camp = Camp.White;
-	public Chess Selected_Chess;
+	public Camp Turn_Camp;
+
+	private Chess _Selected_Chess;
+	public Chess Selected_Chess
+	{
+		get
+		{
+			return _Selected_Chess;
+		}
+		set
+		{
+			Re_GridShow ();
+
+			_Selected_Chess = value;
+		}
+	}
+
 	public List<Image> GridShow = new List<Image> (); // 點擊棋子所顯示的可移動方格
+
+	[Header ("Pawn Promotion Menu")]
+	public GameObject PromotionMenu;
+	public Button Btn_EvolutionQueen;
+	public Button Btn_EvolutionBishop;
+	public Button Btn_EvolutionKnight;
+	public Button Btn_EvolutionRook;
 
 	void Awake ()
 	{
@@ -32,24 +51,38 @@ public class InternationalChessSystem : MonoBehaviour
 	void Start ()
 	{
 		CheckerboardGrids = Checkerboard.GetComponentsInChildren<Grid> (); // 將棋盤格按鈕讀入 checkerboard[] 裡
+
+		Btn_EvolutionQueen.onClick.AddListener (OnClick_EvolutionQueen);
+		Btn_EvolutionBishop.onClick.AddListener (OnClick_EvolutionBishop);
+		Btn_EvolutionKnight.onClick.AddListener (OnClick_EvolutionKnight);
+		Btn_EvolutionRook.onClick.AddListener (OnClick_EvolutionRook);
+	}
+
+	void Update ()
+	{
+		/* 滑鼠事件 */
+		if (Input.GetMouseButtonDown(1) && GridShow.Count > 0)
+		{
+			for (int i = 0; i < GridShow.Count; i++)
+			{
+				GridShow[i].color = Color.clear;
+			}
+			GridShow.Clear ();
+
+			Selected_Chess = null;
+		}
 	}
 
 	public void NewGameSetting ()
 	{
 		/* 先把棋子刪乾淨 */
-		for (int i = 0; i < WhiteChess.Count; i++)
+		for (int i = 0; i < CheckerboardGrids.Length; i++)
 		{
-			Destroy (WhiteChess[i].gameObject);
+			if (CheckerboardGrids[i].transform.childCount > 0)
+			{
+				Destroy (CheckerboardGrids[i].transform.GetChild (0).gameObject);
+			}
 		}
-
-		WhiteChess.Clear ();
-
-		for (int i = 0; i < BlackChess.Count; i++)
-		{
-			Destroy (BlackChess[i].gameObject);
-		}
-
-		BlackChess.Clear ();
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -57,13 +90,11 @@ public class InternationalChessSystem : MonoBehaviour
 			GameObject w_pawn = Instantiate (ChessBox[0], StartingGrids[i]);
 			w_pawn.GetComponent<Image> ().sprite = ChessSprite[0];
 			w_pawn.GetComponent<Chess> ().Force = Camp.White;
-			WhiteChess.Add (w_pawn.GetComponent<Chess> ());
 
 			/* 生成棋子 - B_Pawn */
 			GameObject b_pawn = Instantiate (ChessBox[0], StartingGrids[i + 16]);
 			b_pawn.GetComponent<Image> ().sprite = ChessSprite[6];
 			b_pawn.GetComponent<Chess> ().Force = Camp.Black;
-			BlackChess.Add (b_pawn.GetComponent<Chess> ());
 		}
 
 		for (int i = 0; i < 2; i++)
@@ -72,61 +103,99 @@ public class InternationalChessSystem : MonoBehaviour
 			GameObject w_rook = Instantiate (ChessBox[1], StartingGrids[i + 8]);
 			w_rook.GetComponent<Image> ().sprite = ChessSprite[1];
 			w_rook.GetComponent<Chess> ().Force = Camp.White;
-			WhiteChess.Add (w_rook.GetComponent<Chess> ());
 
 			/* 生成棋子 - B_Rook */
 			GameObject b_rook = Instantiate (ChessBox[1], StartingGrids[i + 24]);
 			b_rook.GetComponent<Image> ().sprite = ChessSprite[7];
 			b_rook.GetComponent<Chess> ().Force = Camp.Black;
-			BlackChess.Add (b_rook.GetComponent<Chess> ());
 
 			/* 生成棋子 - W_Knight */
 			GameObject w_knight = Instantiate (ChessBox[2], StartingGrids[i + 10]);
 			w_knight.GetComponent<Image> ().sprite = ChessSprite[2];
 			w_knight.GetComponent<Chess> ().Force = Camp.White;
-			WhiteChess.Add (w_knight.GetComponent<Chess> ());
 
 			/* 生成棋子 - B_Knight */
 			GameObject b_knight = Instantiate (ChessBox[2], StartingGrids[i + 26]);
 			b_knight.GetComponent<Image> ().sprite = ChessSprite[8];
 			b_knight.GetComponent<Chess> ().Force = Camp.Black;
-			BlackChess.Add (b_knight.GetComponent<Chess> ());
 
 			/* 生成棋子 - W_Bishop */
 			GameObject w_bishop = Instantiate (ChessBox[3], StartingGrids[i + 12]);
 			w_bishop.GetComponent<Image> ().sprite = ChessSprite[3];
 			w_bishop.GetComponent<Chess> ().Force = Camp.White;
-			WhiteChess.Add (w_bishop.GetComponent<Chess> ());
 
 			/* 生成棋子 - B_Bishop */
 			GameObject b_bishop = Instantiate (ChessBox[3], StartingGrids[i + 28]);
 			b_bishop.GetComponent<Image> ().sprite = ChessSprite[9];
 			b_bishop.GetComponent<Chess> ().Force = Camp.Black;
-			BlackChess.Add (b_bishop.GetComponent<Chess> ());
 		}
 
 		/* 生成棋子 - W_Queen */
 		GameObject w_queen = Instantiate (ChessBox[4], StartingGrids[14]);
 		w_queen.GetComponent<Image> ().sprite = ChessSprite[4];
 		w_queen.GetComponent<Chess> ().Force = Camp.White;
-		WhiteChess.Add (w_queen.GetComponent<Chess> ());
 
 		/* 生成棋子 - B_Queen */
 		GameObject b_queen = Instantiate (ChessBox[4], StartingGrids[30]);
 		b_queen.GetComponent<Image> ().sprite = ChessSprite[10];
 		b_queen.GetComponent<Chess> ().Force = Camp.Black;
-		BlackChess.Add (b_queen.GetComponent<Chess> ());
 
 		/* 生成棋子 - W_King */
 		GameObject w_king = Instantiate (ChessBox[5], StartingGrids[15]);
 		w_king.GetComponent<Image> ().sprite = ChessSprite[5];
 		w_king.GetComponent<Chess> ().Force = Camp.White;
-		WhiteChess.Add (w_king.GetComponent<Chess> ());
 
 		/* 生成棋子 - B_King */
 		GameObject b_king = Instantiate (ChessBox[5], StartingGrids[31]);
 		b_king.GetComponent<Image> ().sprite = ChessSprite[11];
 		b_king.GetComponent<Chess> ().Force = Camp.Black;
-		BlackChess.Add (b_king.GetComponent<Chess> ());
+
+		Turn_Camp = Camp.White;
+		Main_GUI.Instance.TurnMessage.text = "輪到白棋";
 	}
+
+	/* 復原格子原色 */
+	public void Re_GridShow () 
+	{
+		for (int i = 0; i < GridShow.Count; i++)
+		{
+			GridShow[i].color = Color.clear;
+		}
+		GridShow.Clear ();
+	}
+
+	/* 勝敗是靠吃掉對方的王而勝利 */
+	public void Judge (Camp force)
+	{
+		if (force == Camp.White)
+		{
+			Main_GUI.Instance.TurnMessage.text = "黑棋 獲勝";
+		}
+		else
+		{
+			Main_GUI.Instance.TurnMessage.text = "白棋 獲勝";
+		}
+	}
+
+	#region UI
+	public void OnClick_EvolutionQueen ()
+	{
+		Selected_Chess.GetComponent<Pawn> ().Promotion (ChessType.Queen);
+	}
+
+	public void OnClick_EvolutionBishop ()
+	{
+		Selected_Chess.GetComponent<Pawn> ().Promotion (ChessType.Bishop);
+	}
+
+	public void OnClick_EvolutionKnight ()
+	{
+		Selected_Chess.GetComponent<Pawn> ().Promotion (ChessType.Knight);
+	}
+
+	public void OnClick_EvolutionRook ()
+	{
+		Selected_Chess.GetComponent<Pawn> ().Promotion (ChessType.Rook);
+	}
+	#endregion
 }

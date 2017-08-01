@@ -13,7 +13,7 @@ public class King : Chess
 		{
 			InternationalChessSystem.Instance.Selected_Chess = this;
 
-			string[] coordinate = transform.parent.gameObject.name.Split (',');
+			string[] coordinate = transform.parent.name.Split (',');
 			int x = Convert.ToInt32 (coordinate[0]);
 			int y = Convert.ToInt32 (coordinate[1]);
 
@@ -51,5 +51,10 @@ public class King : Chess
 				InternationalChessSystem.Instance.GridShow.Add (search_result.GetComponent<Image> ());
 			}
 		}
+	}
+
+	void OnDestroy ()
+	{
+		InternationalChessSystem.Instance.Judge (Force);
 	}
 }

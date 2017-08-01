@@ -13,7 +13,7 @@ public class Pawn : Chess
 		{
 			InternationalChessSystem.Instance.Selected_Chess = this;
 
-			string[] coordinate = transform.parent.gameObject.name.Split (',');
+			string[] coordinate = transform.parent.name.Split (',');
 			int x = Convert.ToInt32 (coordinate[0]);
 			int y = Convert.ToInt32 (coordinate[1]);
 
@@ -86,5 +86,72 @@ public class Pawn : Chess
 				}
 			}
 		}
+	}
+
+	public void Promotion (ChessType type) // 升變
+	{
+		switch (type)
+		{
+		case ChessType.Queen:
+			GameObject queen = Instantiate (InternationalChessSystem.Instance.ChessBox[4], transform.parent);
+
+			if (Force == Camp.White)
+			{
+				queen.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[4];
+				queen.GetComponent<Chess> ().Force = Camp.White;
+			}
+			else if (Force == Camp.Black)
+			{
+				queen.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[10];
+				queen.GetComponent<Chess> ().Force = Camp.Black;
+			}
+			break;
+		case ChessType.Bishop:
+			GameObject bishop = Instantiate (InternationalChessSystem.Instance.ChessBox[3], transform.parent);
+
+			if (Force == Camp.White)
+			{
+				bishop.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[3];
+				bishop.GetComponent<Chess> ().Force = Camp.White;
+			}
+			else if (Force == Camp.Black)
+			{
+				bishop.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[9];
+				bishop.GetComponent<Chess> ().Force = Camp.Black;
+			}
+			break;
+		case ChessType.Knight:
+			GameObject knight = Instantiate (InternationalChessSystem.Instance.ChessBox[2], transform.parent);
+
+			if (Force == Camp.White)
+			{
+				knight.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[2];
+				knight.GetComponent<Chess> ().Force = Camp.White;
+			}
+			else if (Force == Camp.Black)
+			{
+				knight.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[8];
+				knight.GetComponent<Chess> ().Force = Camp.Black;
+			}
+			break;
+		case ChessType.Rook:
+			GameObject rook = Instantiate (InternationalChessSystem.Instance.ChessBox[1], transform.parent);
+
+			if (Force == Camp.White)
+			{
+				rook.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[1];
+				rook.GetComponent<Chess> ().Force = Camp.White;
+			}
+			else if (Force == Camp.Black)
+			{
+				rook.GetComponent<Image> ().sprite = InternationalChessSystem.Instance.ChessSprite[7];
+				rook.GetComponent<Chess> ().Force = Camp.Black;
+			}
+			break;
+		}
+
+		InternationalChessSystem.Instance.PromotionMenu.SetActive (false);
+		InternationalChessSystem.Instance.Selected_Chess = null;
+		Destroy (gameObject);
 	}
 }

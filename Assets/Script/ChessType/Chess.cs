@@ -21,24 +21,37 @@ public class Chess : MonoBehaviour
 			{
 				InternationalChessSystem.Instance.Selected_Chess.transform.SetParent (transform.parent);
 				InternationalChessSystem.Instance.Selected_Chess.transform.localPosition = Vector2.zero;
-				InternationalChessSystem.Instance.Selected_Chess = null;
+				InternationalChessSystem.Instance.Re_GridShow ();
 
-				for (int j = 0; j < InternationalChessSystem.Instance.GridShow.Count; j++)
+				/* Pawn的升變 */
+				if (InternationalChessSystem.Instance.Selected_Chess.name == "Pawn")
 				{
-					InternationalChessSystem.Instance.GridShow[j].color = Color.clear;
+					string[] coordinate = InternationalChessSystem.Instance.Selected_Chess.transform.name.Split (',');
+
+					if (int.Parse (coordinate[1]) == 1 || int.Parse (coordinate[1]) == 8)
+					{
+						InternationalChessSystem.Instance.PromotionMenu.SetActive (true);
+					}
+					else
+					{
+						InternationalChessSystem.Instance.Selected_Chess = null;
+					}
 				}
-				InternationalChessSystem.Instance.GridShow.Clear ();
+				else
+				{
+					InternationalChessSystem.Instance.Selected_Chess = null;
+				}
 
 				/* 把Chess從List Remove掉 */
 				if (Force == Camp.White)
 				{
-					InternationalChessSystem.Instance.WhiteChess.Remove (this);
 					InternationalChessSystem.Instance.Turn_Camp = Camp.White; // 哪方被吃掉，意味著下回合是該方行動
+					Main_GUI.Instance.TurnMessage.text = "輪到白棋";
 				}
 				else
 				{
-					InternationalChessSystem.Instance.BlackChess.Remove (this);
 					InternationalChessSystem.Instance.Turn_Camp = Camp.Black; // 哪方被吃掉，意味著下回合是該方行動
+					Main_GUI.Instance.TurnMessage.text = "輪到黑棋";
 				}
 
 				Destroy (gameObject);
