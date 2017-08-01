@@ -19,9 +19,29 @@ public class Chess : MonoBehaviour
 		{
 			if (InternationalChessSystem.Instance.GridShow[i].transform == transform.parent)
 			{
-				InternationalChessSystem.Instance.Selected_Chess.transform.SetParent (transform);
+				InternationalChessSystem.Instance.Selected_Chess.transform.SetParent (transform.parent);
 				InternationalChessSystem.Instance.Selected_Chess.transform.localPosition = Vector2.zero;
 				InternationalChessSystem.Instance.Selected_Chess = null;
+
+				for (int j = 0; j < InternationalChessSystem.Instance.GridShow.Count; j++)
+				{
+					InternationalChessSystem.Instance.GridShow[j].color = Color.clear;
+				}
+				InternationalChessSystem.Instance.GridShow.Clear ();
+
+				/* 把Chess從List Remove掉 */
+				if (Force == Camp.White)
+				{
+					InternationalChessSystem.Instance.WhiteChess.Remove (this);
+					InternationalChessSystem.Instance.Turn_Camp = Camp.White; // 哪方被吃掉，意味著下回合是該方行動
+				}
+				else
+				{
+					InternationalChessSystem.Instance.BlackChess.Remove (this);
+					InternationalChessSystem.Instance.Turn_Camp = Camp.Black; // 哪方被吃掉，意味著下回合是該方行動
+				}
+
+				Destroy (gameObject);
 			}
 		}
 	}

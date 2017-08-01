@@ -14,8 +14,8 @@ public class InternationalChessSystem : MonoBehaviour
 	public Grid[] CheckerboardGrids;
 	public Transform[] StartingGrids; // 白棋：0~15、黑棋：16~31
 
-	private List<Chess> WhiteChess = new List<Chess> ();
-	private List<Chess> BlackChess = new List<Chess> ();
+	public List<Chess> WhiteChess = new List<Chess> ();
+	public List<Chess> BlackChess = new List<Chess> ();
 
 	[Header ("Game Play Use")]
 	public Camp Player1_Camp;

@@ -19,25 +19,27 @@ public class Pawn : Chess
 
 			if (InternationalChessSystem.Instance.Turn_Camp == Camp.White)
 			{
-				if (y == 2) // 如果是第一步
+				CheckGrid (x, y + 1); // ↑
+
+				if (y == 2) // 如果是第一次移動，可以走到兩步
 				{
-					
+					CheckGrid (x, y + 2); // ↑↑
 				}
-				else
-				{
-					
-				}
+
+				CheckGrid_PawnAttack (x + 1, y + 1); // ↗
+				CheckGrid_PawnAttack (x - 1, y + 1); // ↖
 			}
-			else if (InternationalChessSystem.Instance.Turn_Camp == Camp.White)
+			else if (InternationalChessSystem.Instance.Turn_Camp == Camp.Black)
 			{
-				if (y == 7) // 如果是第一步
-				{
+				CheckGrid (x, y - 1); // ↓
 
-				}
-				else
+				if (y == 7) // 如果是第一次移動，可以走到兩步
 				{
-
+					CheckGrid (x, y - 2); // ↓↓
 				}
+
+				CheckGrid_PawnAttack (x + 1, y - 1); // ↘
+				CheckGrid_PawnAttack (x - 1, y - 1); // ↙
 			}
 		}
 		else
@@ -46,5 +48,43 @@ public class Pawn : Chess
 		}
 	}
 
+	private void CheckGrid (int x, int y)
+	{
+		Transform search_result = InternationalChessSystem.Instance.Checkerboard.transform.Find (string.Format ("{0},{1}", x, y));
 
+		/* 檢查「格子」是否存在 */
+		if (search_result != null) 
+		{
+			/* 檢查「格子」是否有棋子在上面 */
+			if (search_result.childCount == 0)  // 空格
+			{
+				search_result.GetComponent<Image> ().color = new Color (0, 1, 0, 0.5f);
+				InternationalChessSystem.Instance.GridShow.Add (search_result.GetComponent<Image> ());
+			}
+			else if (search_result.GetComponentInChildren<Chess> ().Force != Force) // 敵隊
+			{
+				search_result.GetComponent<Image> ().color = new Color (1, 0, 0, 0.5f);
+				InternationalChessSystem.Instance.GridShow.Add (search_result.GetComponent<Image> ());
+			}
+		}
+	}
+
+	private void CheckGrid_PawnAttack (int x, int y)
+	{
+		Transform search_result = InternationalChessSystem.Instance.Checkerboard.transform.Find (string.Format ("{0},{1}", x, y));
+
+		/* 檢查「格子」是否存在 */
+		if (search_result != null) 
+		{
+			/* 檢查「格子」是否有棋子在上面 */
+			if (search_result.childCount != 0)  // 空格
+			{
+				if (search_result.GetComponentInChildren<Chess> ().Force != Force) // 敵隊
+				{
+					search_result.GetComponent<Image> ().color = new Color (1, 0, 0, 0.5f);
+					InternationalChessSystem.Instance.GridShow.Add (search_result.GetComponent<Image> ());
+				}
+			}
+		}
+	}
 }
