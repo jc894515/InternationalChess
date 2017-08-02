@@ -10,6 +10,7 @@
 
 public enum Camp
 {
+	None,
 	White,
 	Black
 }

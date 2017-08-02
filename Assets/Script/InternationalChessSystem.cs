@@ -175,6 +175,8 @@ public class InternationalChessSystem : MonoBehaviour
 		{
 			Main_GUI.Instance.TurnMessage.text = "白棋 獲勝";
 		}
+
+		Turn_Camp = Camp.None;
 	}
 
 	#region UI
